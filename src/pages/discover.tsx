@@ -271,11 +271,17 @@ function SwipeCard({
             </div>
           </div>
 
-          {candidate.lastCommitSnippet && (
+          {candidate.recentCommits && candidate.recentCommits.length > 0 && (
             <div>
-              <h3 className="text-sm font-medium text-gc-muted mb-2">Latest Commit</h3>
-              <div className="p-3 bg-gc-darker rounded-lg font-mono text-sm text-gc-text">
-                {candidate.lastCommitSnippet}
+              <h3 className="text-sm font-medium text-gc-muted mb-2">Recent Commits</h3>
+              <div className="space-y-1.5">
+                {candidate.recentCommits.map((commit) => (
+                  <div key={commit.sha} className="p-2 bg-gc-darker rounded-lg">
+                    <p className="text-sm text-gc-text font-mono truncate">
+                      {commit.message}
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
           )}

@@ -28,7 +28,12 @@ export interface CandidateProfile {
   highlights: string;
   commitTraits: Record<string, number>;
   languages: Record<string, number>;
-  lastCommitSnippet?: string;
+  recentCommits?: Array<{
+    sha: string;
+    message: string;
+    repo: string;
+    date: string;
+  }>;
 }
 
 // Match response

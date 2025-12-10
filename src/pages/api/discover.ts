@@ -139,11 +139,12 @@ export default async function handler(
         continue;
       }
 
-      // Get last commit for snippet
-      const lastCommit = await prisma.commit.findFirst({
+      // Get last 5 commits
+      const recentCommits = await prisma.commit.findMany({
         where: { userId: candidate.userId },
         orderBy: { date: 'desc' },
-        select: { message: true },
+        take: 5,
+        select: { sha: true, message: true, repo: true, date: true },
       });
 
       results.push({
@@ -154,7 +155,12 @@ export default async function handler(
         highlights: candidate.highlights,
         commitTraits: candidate.commitTraits as Record<string, number>,
         languages: candidate.languages as Record<string, number>,
-        lastCommitSnippet: lastCommit?.message?.slice(0, 100),
+        recentCommits: recentCommits.map(c => ({
+          sha: c.sha,
+          message: c.message,
+          repo: c.repo,
+          date: c.date.toISOString(),
+        })),
       });
     }
 

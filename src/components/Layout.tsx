@@ -74,8 +74,10 @@ export default function Layout({ children }: LayoutProps) {
 
       <footer className="border-t border-gc-border mt-auto py-6">
         <div className="max-w-6xl mx-auto px-4 text-center text-gc-muted text-sm">
-          <p>GitCommit — Find your code soulmate</p>
+          <p>GitCommit</p>
           <p className="mt-1">Made with ❤️ and too many commits</p>
+          <p className="mt-1">Not affiliated with Git</p>
+
         </div>
       </footer>
     </div>

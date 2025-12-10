@@ -1,0 +1,99 @@
+// Prisma schema for GitCommit - Tinder for developers
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  githubId  String   @unique
+  username  String
+  avatar    String?
+  bio       String?
+  email     String?
+  isAdmin   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  profile   Profile?
+  commits   Commit[]
+  
+  // Rate limiting
+  likesCount     Int      @default(0)
+  likesResetAt   DateTime @default(now())
+  messagesCount  Int      @default(0)
+  messagesResetAt DateTime @default(now())
+}
+
+model Profile {
+  id            String    @id @default(uuid())
+  userId        String    @unique
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  languages     Json      // Record<string, number> - normalized language distribution
+  commitTraits  Json      // Record<string, number> - normalized trait scores
+  activityScore Float     // 0..1 score based on recent activity
+  highlights    String    // Top two trait names, comma-separated
+  lastSynced    DateTime?
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Commit {
+  id       String   @id @default(uuid())
+  userId   String
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sha      String
+  message  String
+  repo     String
+  date     DateTime
+  
+  createdAt DateTime @default(now())
+  
+  @@unique([userId, sha])
+  @@index([userId])
+  @@index([date])
+}
+
+model Like {
+  id        String   @id @default(uuid())
+  fromUser  String
+  toUser    String
+  createdAt DateTime @default(now())
+  
+  @@unique([fromUser, toUser])
+  @@index([fromUser])
+  @@index([toUser])
+}
+
+model Match {
+  id        String    @id @default(uuid())
+  userA     String
+  userB     String
+  score     Float
+  createdAt DateTime  @default(now())
+  
+  messages  Message[]
+  
+  @@unique([userA, userB])
+  @@index([userA])
+  @@index([userB])
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  matchId   String
+  match     Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  fromUser  String
+  body      String
+  createdAt DateTime @default(now())
+  
+  @@index([matchId])
+  @@index([fromUser])
+}
+
